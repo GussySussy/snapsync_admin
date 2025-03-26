@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import { SidebarProvider, SidebarTrigger } from "@/app/components/ui/sidebar";
-import { AppSidebar } from "@/app/components/ui/app-sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app/app-sidebar";
 
 // filepath: d:\Projects\Development\snapsync_admin\src\app\dashboard\layout.tsx
 

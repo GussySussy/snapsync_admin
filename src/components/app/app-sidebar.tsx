@@ -5,7 +5,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-} from "../../components/ui/sidebar";
+} from "../ui/sidebar";
 import Link from "next/link";
 
 export function AppSidebar() {
