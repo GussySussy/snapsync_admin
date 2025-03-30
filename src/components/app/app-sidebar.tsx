@@ -25,10 +25,12 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton>Images</SidebarMenuButton>
+            <SidebarMenuButton>
+              <Link href="/dashboard/images">Images</Link>
+            </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton>Users</SidebarMenuButton>
+            <Link href="/dashboard/users">Users</Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton>Settings</SidebarMenuButton>
