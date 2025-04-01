@@ -17,11 +17,21 @@ import {
 } from "@/components/ui/dialog";
 import { ImagesTable } from "@/components/app/images-table";
 
+interface ImageItem {
+  id: string;
+  name: string;
+  imageUrl: string;
+  eventName?: string;
+  createdBy: string;
+  createdAt?: string;
+}
+
 export default function ImagesPage() {
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState<ImageItem[]>([]);
   const [events, setEvents] = useState<{ id: string; name: string }[]>([]);
   const [users, setUsers] = useState<{ clerk_id: string; name?: string }[]>([]);
-
+  
+  const [loading, setLoading] = useState(true);
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [selectedEvent, setSelectedEvent] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
@@ -29,24 +39,62 @@ export default function ImagesPage() {
   const [selectedFileNames, setSelectedFileNames] = useState<string[]>([]);
 
   useEffect(() => {
-    fetchImages();
-    fetchEvents();
-    fetchUsers();
+    fetchData();
   }, []);
+  
+  async function fetchData() {
+    setLoading(true);
+    try {
+      await Promise.all([
+        fetchImages(),
+        fetchEvents(),
+        fetchUsers()
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function fetchImages() {
-    const res = await fetch("/api/images");
-    if (res.ok) setImages(await res.json());
+    try {
+      const res = await fetch("/api/images");
+      if (res.ok) {
+        const data = await res.json();
+        setImages(data);
+      } else {
+        console.error("Failed to fetch images");
+      }
+    } catch (error) {
+      console.error("Error fetching images:", error);
+    }
   }
 
   async function fetchEvents() {
-    const res = await fetch("/api/events"); // Adjust API endpoint
-    if (res.ok) setEvents(await res.json());
+    try {
+      const res = await fetch("/api/events");
+      if (res.ok) {
+        const data = await res.json();
+        setEvents(data);
+      } else {
+        console.error("Failed to fetch events");
+      }
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    }
   }
 
   async function fetchUsers() {
-    const res = await fetch("/api/users"); // Adjust API endpoint
-    if (res.ok) setUsers(await res.json());
+    try {
+      const res = await fetch("/api/users");
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(data);
+      } else {
+        console.error("Failed to fetch users");
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
   }
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,6 +117,7 @@ export default function ImagesPage() {
     formData.append("created_by", selectedUser);
 
     try {
+      setLoading(true);
       const res = await fetch("/api/images", {
         method: "POST",
         body: formData,
@@ -80,18 +129,20 @@ export default function ImagesPage() {
       setSelectedEvent("");
       setSelectedUser("");
       setIsModalOpen(false);
-      fetchImages();
+      await fetchImages();
     } catch (error) {
       console.error("Error uploading images:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-4">Images</h1>
-
-      {/* Upload Button */}
-      <Button onClick={() => setIsModalOpen(true)}>Upload an Image</Button>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">Images</h1>
+        {/* <Button onClick={() => setIsModalOpen(true)}>Upload an Image</Button> */}
+      </div>
 
       {/* Upload Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -100,7 +151,6 @@ export default function ImagesPage() {
             <DialogTitle>Upload an Image</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            {/* File Upload Button */}
             {/* File Upload Button */}
             <Button
               onClick={() => document.getElementById("fileInput")?.click()}
@@ -144,8 +194,7 @@ export default function ImagesPage() {
               <SelectContent>
                 {users.map((user) => (
                   <SelectItem key={user.clerk_id} value={user.clerk_id}>
-                    {user.name || user.clerk_id}{" "}
-                    {/* Show name if available, otherwise ID */}
+                    {user.name || user.clerk_id}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -162,7 +211,11 @@ export default function ImagesPage() {
         </DialogContent>
       </Dialog>
 
-      <ImagesTable images={images} fetchImages={fetchImages} />
+      <ImagesTable 
+        images={images} 
+        fetchImages={fetchImages} 
+        isLoading={loading}
+      />
     </div>
   );
 }

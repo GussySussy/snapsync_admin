@@ -11,7 +11,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Skeleton } from "@/components/ui/skeleton";
 
 interface Event {
   id: string;
@@ -22,7 +21,7 @@ interface Event {
 }
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<Event[] | null>(null);
+  const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [creatingEvent, setCreatingEvent] = useState<boolean>(false);
@@ -38,6 +37,7 @@ export default function EventsPage() {
 
   async function fetchEvents() {
     try {
+      setLoading(true);
       const res = await fetch("/api/events");
       if (!res.ok) throw new Error("Failed to fetch events");
       const data: Event[] = await res.json();
@@ -91,22 +91,19 @@ export default function EventsPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-4">Events</h1>
-      <Button onClick={() => setCreatingEvent(true)} className="mb-4">
-        + Create Event
-      </Button>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">Events</h1>
+        {/* <Button onClick={() => setCreatingEvent(true)}>
+          + Create Event
+        </Button> */}
+      </div>
 
-      {loading ? (
-        <Skeleton className="h-64 w-full" />
-      ) : events && events.length > 0 ? (
-        <EventsTable
-          events={events}
-          onEdit={setEditingEvent}
-          onDelete={handleDelete}
-        />
-      ) : (
-        <p className="text-gray-500">No events found.</p>
-      )}
+      <EventsTable
+        events={events}
+        onEdit={setEditingEvent}
+        onDelete={handleDelete}
+        isLoading={loading}
+      />
 
       {/* Edit Event Dialog */}
       <Dialog open={!!editingEvent} onOpenChange={() => setEditingEvent(null)}>

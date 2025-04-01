@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app/app-sidebar";
@@ -23,19 +23,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
       <div className="flex h-screen">
-        {/* Sidebar */}
-        <AppSidebar />
-
-        {/* Main Content */}
+        <AppSidebar onLogout={handleLogout} />
         <div className="flex-1 flex flex-col p-4">
-          {/* Logout Button at the Top Right */}
-          <div className="flex justify-end mb-4">
-            <Button onClick={handleLogout} variant="destructive">
-              Logout
-            </Button>
-          </div>
-
-          {/* Page Content */}
           {children}
         </div>
       </div>
